@@ -1,11 +1,45 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 
+import { login } from "../api/index";
 import googleLogo from "../assets/google-logo.png";
 import kuma from "../assets/kuma.png";
 import speechBubble from "../assets/speech-bubble.png";
+import {
+  firebaseAuth,
+  googleProvider,
+  signInWithRedirect,
+} from "../config/firebase";
 
 const Login = () => {
+  const handleLogin = async () => {
+    await signInWithRedirect(firebaseAuth, googleProvider);
+  };
+
+  const handleSendToken = async () => {
+    try {
+      const token = await firebaseAuth.currentUser.getIdToken();
+
+      if (token) {
+        const result = await login(token);
+
+        if (result.data.token) {
+          localStorage.setItem("token", result.data.token);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    firebaseAuth.onAuthStateChanged((user) => {
+      if (user) {
+        handleSendToken();
+      }
+    });
+  }, []);
+
   return (
     <LoginContainer>
       <div className="introPhrase">
@@ -14,7 +48,7 @@ const Login = () => {
         <p>KUMA</p>
       </div>
       <div className="loginButton">
-        <button>
+        <button onClick={handleLogin}>
           <img src={googleLogo} alt="googleLogo" />
           <p>Sign in with Google</p>
         </button>
