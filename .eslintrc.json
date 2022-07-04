@@ -19,7 +19,6 @@
     "quotes": ["warn", "double"],
     "comma-style": ["warn", "last"],
     "no-var": "warn",
-    "arrow-body-style": ["warn", "as-needed"],
     "camelcase": "error",
     "dot-notation": "error",
     "eqeqeq": ["error", "always"],
