@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import styled from "styled-components";
 
+import Loading from "../component/Loading";
 import Login from "../component/Login";
 
 const App = () => {
@@ -10,6 +11,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login />} />
       </Routes>
+      <Loading />
     </MainContainer>
   );
 };
