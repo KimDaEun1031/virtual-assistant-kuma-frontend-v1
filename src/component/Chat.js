@@ -1,11 +1,66 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
+import { getChatAnswer } from "../api";
 import consulting from "../assets/icons/consulting.png";
 import exit from "../assets/icons/exit.png";
 import kumaProfile from "../assets/profiles/kuma-profile.png";
 
 const Chat = () => {
+  const [messageInput, setMessageInput] = useState({
+    message: ""
+  });
+  const [messages, setMessages] = useState([]);
+
+  const getMessage = async (text) => {
+    const result = await getChatAnswer(text);
+
+    const messageInfo = {
+      sender: "bot",
+      message: result.data.answer,
+    };
+
+    if (result.data) {
+      setMessages([
+        ...messages,
+        messageInfo,
+      ]);
+    }
+  };
+
+  const handleChatInput = (event) => {
+    const { name, value } = event.target;
+
+    setMessageInput({
+      ...messageInput,
+      [name]: value,
+    });
+  };
+
+  const handleSendMessage = (event) => {
+    event.preventDefault();
+
+    if (messageInput.message) {
+      const messageInfo = {
+        sender: "human",
+        message: text,
+      };
+
+      setMessages([
+        ...messages,
+        messageInfo,
+      ]);
+
+      setMessageInput({
+        message: ""
+      });
+    }
+  };
+
+  useEffect(() => {
+    getMessage("안녕");
+  }, []);
+
   return (
     <ChatContainer>
       <div className="chatInfo">
@@ -19,26 +74,23 @@ const Chat = () => {
       </div>
       <div className="chat">
         <ul>
-          <li className="human">
-            <p>영어 공부해</p>
-          </li>
-          <li className="bot">
-            <img src={kumaProfile} alt="profile" />
-            <p>무슨 공부하고 있는데?</p>
-          </li>
-          <li className="human">
-            <p>나 지금 공부하고 있어!</p>
-          </li>
-          <li className="bot">
-            <img src={kumaProfile} alt="profile" />
-            <p>뭐해?</p>
-          </li>
+          {messages.length !== 0 && messages.map((item) => (
+            <li className={item.sender}>
+              {item.sender === "bot" && <img src={kumaProfile} alt="profile" />}
+              <p>{item.message}</p>
+            </li>
+          ))}
         </ul>
       </div>
-      <div className="chatInputContainer">
-        <input type="text" placeholder="KUMA에게 메세지 보내기" />
+      <form className="chatInputContainer" onSubmit={handleSendMessage}>
+        <input
+          placeholder="KUMA에게 메세지 보내기"
+          onChange={handleChatInput}
+          value={messageInput.message}
+          name="message"
+        />
         <button>전송</button>
-      </div>
+      </form>
     </ChatContainer>
   );
 };
@@ -81,9 +133,10 @@ const ChatContainer = styled.div`
 
     ul {
       display: flex;
-      flex-flow: column-reverse;
+      flex-flow: column;
       align-items: center;
       height: 100%;
+      margin-top: 40px;
       overflow: scroll;
 
       li {
@@ -91,10 +144,6 @@ const ChatContainer = styled.div`
         align-items: center;
         width: 95%;
         margin: 10px;
-
-        &:first-child {
-          margin-bottom: 50px;
-        }
 
         &.human {
           justify-content: end;
