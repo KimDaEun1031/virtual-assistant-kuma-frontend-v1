@@ -30,3 +30,7 @@ export const login = (firebaseToken) => {
     { headers: { Authorization: `Bearer ${firebaseToken}` } }
   );
 };
+
+export const getCalendarEvent = () => {
+  return API.get("/calendar/auth");
+};
