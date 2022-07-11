@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import styled from "styled-components";
 
+import Calendar from "../component/Calendar";
 import Chat from "../component/Chat";
 import Loading from "../component/Loading";
 import Login from "../component/Login";
@@ -14,6 +15,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Main />} />
         <Route path="/chat" element={<Chat />} />
+        <Route path="/calendar" element={<Calendar />} />
       </Routes>
       <Loading />
     </MainContainer>
