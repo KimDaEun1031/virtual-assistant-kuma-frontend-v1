@@ -34,3 +34,7 @@ export const login = (firebaseToken) => {
 export const getCalendarEvent = () => {
   return API.get("/calendar/auth");
 };
+
+export const getChatAnswer = (text) => {
+  return API.post("/chat/textQuery", { text });
+};
