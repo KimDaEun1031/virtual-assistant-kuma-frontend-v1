@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+import { updateUser } from "../api";
 import koa from "../assets/characters/koa.png";
 import koi from "../assets/characters/koi.png";
 import kuma from "../assets/characters/kuma.png";
@@ -8,10 +10,44 @@ import exit from "../assets/icons/exit.png";
 import PreferenceModal from "./PreferenceModal";
 
 const Preference = () => {
+  const navigate = useNavigate();
+  const [openModal, setOpenModal] = useState(false);
+  const [modalNumber, setModalNumber] = useState(1);
+  const [userInfo, setUserInfo] = useState({
+    name: "",
+    character: "kuma",
+  });
+
+  const handleOpenModal = (event) => {
+    const { value } = event.currentTarget;
+    setModalNumber(value);
+    setOpenModal(true);
+  };
+
+  const handleModal = (result) => {
+    setOpenModal(result);
+  };
+
+  const handleChangeInfo = (event) => {
+    const { name, value } = event.currentTarget;
+
+    setUserInfo({
+      ...userInfo,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const { name, character } = userInfo;
+    await updateUser(name, character);
+  };
+
   return (
     <PreferenceContainer>
       <div className="preferenceInfo">
-        <button>
+        <button onClick={() => {navigate("/");}}>
           <img src={exit} alt="exitButton" />
         </button>
         <span>Preference</span>
@@ -19,49 +55,94 @@ const Preference = () => {
       </div>
       <div className="preference">
         <div className="container">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="nickName">
               <p>Nickname</p>
               <div className="line" />
-              <input type="text" />
+              <input
+                type="text"
+                name="name"
+                onChange={handleChangeInfo}
+                value={userInfo.name}
+              />
               <div className="line" />
             </div>
             <div className="characters">
               <p>Characters</p>
               <div className="line" />
               <div className="characterList">
-                <button type="button">
+                <button
+                  type="button"
+                  value="koi"
+                  name="character"
+                  onClick={handleChangeInfo}
+                >
                   <img src={koa} alt="koa" />
                 </button>
-                <button type="button">
+                <button
+                  type="button"
+                  value="koi"
+                  name="character"
+                  onClick={handleChangeInfo}
+                >
                   <img src={koi} alt="koi" />
                 </button>
-                <button type="button">
+                <button
+                  type="button"
+                  value="kuma"
+                  name="character"
+                  onClick={handleChangeInfo}
+                >
                   <img src={kuma} alt="kuma" />
                 </button>
               </div>
             </div>
+            <button className="submitBtn">변경사항 저장</button>
           </form>
           <div className="line" />
           <div className="helpAssistant">
             <p>Help Assistant</p>
             <div className="line" />
             <div className="helpList">
-              <button>Home</button>
-              <button>ChatBot</button>
-              <button>Calendar</button>
-              <button>Weather</button>
-              <button>Character</button>
+              <button
+                value="0"
+                onClick={handleOpenModal}
+              >
+                Home
+              </button>
+              <button
+                value="1"
+                onClick={handleOpenModal}
+              >
+                ChatBot
+              </button>
+              <button
+                value="2"
+                onClick={handleOpenModal}
+              >
+                Calendar
+              </button>
+              <button
+                value="3"
+                onClick={handleOpenModal}
+              >
+                Weather
+              </button>
+              <button
+                value="4"
+                onClick={handleOpenModal}
+              >
+                Character
+              </button>
             </div>
           </div>
           <div className="footer">
             <button className="logoutBtn">로그아웃</button>
-            <button className="submitBtn">변경사항 저장</button>
             <p>Copyrightⓒ2022 DaeunKim All rights reserved.</p>
           </div>
         </div>
       </div>
-      <PreferenceModal />
+      {openModal && <PreferenceModal modalNumber={modalNumber} handleModal={handleModal} />}
     </PreferenceContainer>
   );
 };
@@ -127,8 +208,11 @@ const PreferenceContainer = styled.div`
       }
 
       form {
+        text-align: center;
+
         .nickName {
           margin-top: 10px;
+          text-align: left;
 
           input {
             width: 99%;
@@ -141,6 +225,7 @@ const PreferenceContainer = styled.div`
 
         .characters {
           margin-top: 10px;
+          text-align: left;
 
           .characterList {
             display: flex;
@@ -160,6 +245,15 @@ const PreferenceContainer = styled.div`
               }
             }
           }
+        }
+
+        .submitBtn {
+          margin: 10px;
+          border-radius: 50px;
+          background-color: #92E32B;
+          font-size: 14px;
+          font-family: "Itim";
+          color: white;
         }
       }
 
