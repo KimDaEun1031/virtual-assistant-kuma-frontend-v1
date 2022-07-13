@@ -7,6 +7,7 @@ import Chat from "../component/Chat";
 import Loading from "../component/Loading";
 import Login from "../component/Login";
 import Main from "../component/Main";
+import Weather from "../component/Weather";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/" element={<Main />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/calendar" element={<Calendar />} />
+        <Route path="/weather" element={<Weather />} />
       </Routes>
       <Loading />
     </MainContainer>
