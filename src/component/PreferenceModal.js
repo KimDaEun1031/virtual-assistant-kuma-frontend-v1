@@ -3,37 +3,49 @@ import styled from "styled-components";
 
 import homeExample from "../assets/assistant-example.png";
 
-const PreferenceModal = () => {
+const PreferenceModal = ({ modalNumber, handleModal }) => {
   const slideRef = useRef(null);
-  const [count, setCount] = useState(1);
+  const [count, setCount] = useState(Number(modalNumber));
+
+  const handleDisableItems = (number) => {
+    const childs = slideRef.current.children;
+
+    [...childs].map((item, idx) => {
+      if (idx !== number) {
+        item.style.display = "none";
+      } else {
+        item.style.display = "block";
+      }
+    });
+  };
+
+  const handleNextSlider = () => {
+    if (count < 4) {
+      setCount(count + 1);
+    } else {
+      setCount(4);
+    }
+
+    handleDisableItems(count + 1);
+  };
+
+  const handlePreviousSlider = () => {
+    if (count > 0) {
+      setCount(count - 1);
+    } else {
+      setCount(0);
+    }
+
+    handleDisableItems(count - 1);
+  };
+
+  const handleCloseModal = () => {
+    handleModal(false);
+  };
 
   useEffect(() => {
-    const interval = setTimeout(() => {
-      setCount(() => {
-        if (count < 5) {
-          setCount(count + 1);
-        } else {
-          setCount(1);
-        }
-      });
-
-      handleSlider(count);
-
-      return () => clearTimeout(interval);
-    }, 3000);
-  });
-
-  const handleSlider = count => {
-    if (count === 5) {
-      console.log(window.innerWidth);
-      slideRef.current.style.transform = "translateX(0)";
-    } else {
-      console.log(window.innerWidth);
-      slideRef.current.style.transform = `translateX(-${
-        window.innerWidth * count
-      }px)`;
-    }
-  };
+    handleDisableItems(count);
+  }, []);
 
   return (
     <PreferenceModalContainer>
@@ -59,7 +71,31 @@ const PreferenceModal = () => {
           <img src={homeExample} alt="example" />
         </li>
       </ul>
-      <button type="button" className="cancelBtn">Cancel</button>
+      <div className="btnGroup">
+        <button
+          type="button"
+          className="previousBtn"
+          disabled={count === 0 ? true : false}
+          onClick={handlePreviousSlider}
+        >
+          ←
+        </button>
+        <button
+          type="button"
+          className="cancelBtn"
+          onClick={handleCloseModal}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="nextBtn"
+          disabled={count === 4 ? true : false}
+          onClick={handleNextSlider}
+        >
+          →
+        </button>
+      </div>
     </PreferenceModalContainer>
   );
 };
@@ -69,21 +105,38 @@ const PreferenceModalContainer = styled.div`
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(78, 78, 78, 0.5);
+  background-color: white;
   text-align: center;
 
   ul {
     display: flex;
   }
 
-  button {
-    padding: 2px 15px;
-    border-radius: 50px;
-    margin: 0 10px;
-    font-family: "Itim";
-    font-size: 16px;
-    color: white;
-    background-color: #92E32B;
+  .btnGroup {
+    display: flex;
+    justify-content: space-evenly;
+
+    button {
+      padding: 2px 15px;
+      border-radius: 50px;
+      margin: 0 10px;
+      font-family: "Itim";
+      font-size: 16px;
+      color: white;
+      background-color: #92E32B;
+
+      &.previousBtn, &.nextBtn {
+        padding: 3px;
+        border-radius: 50%;
+        font-size: 20px;
+        font-family: 'Katuri';
+      }
+
+      &:disabled {
+        background-color: #7EC722;
+        opacity: 0.5;
+      }
+    }
   }
 `;
 
