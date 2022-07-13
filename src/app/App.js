@@ -7,6 +7,7 @@ import Chat from "../component/Chat";
 import Loading from "../component/Loading";
 import Login from "../component/Login";
 import Main from "../component/Main";
+import Preference from "../component/Preference";
 import Weather from "../component/Weather";
 
 const App = () => {
@@ -18,8 +19,9 @@ const App = () => {
         <Route path="/chat" element={<Chat />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/weather" element={<Weather />} />
+        <Route path="/preference" element={<Preference />} />
       </Routes>
-      <Loading />
+      {/* <Loading /> */}
     </MainContainer>
   );
 };
