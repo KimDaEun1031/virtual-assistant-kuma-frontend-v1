@@ -1,18 +1,225 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 
+import { getWeatherInfo } from "../api";
 import exit from "../assets/icons/exit.png";
 import reload from "../assets/icons/reload.png";
 import rainboots from "../assets/recommandItemIcons/rainboots.png";
 import raincoat from "../assets/recommandItemIcons/raincoat.png";
 import umbrella from "../assets/recommandItemIcons/umbrella.png";
-import rainy from "../assets/weatherIcons/rainy.png";
 
 const Weather = () => {
+  const navigate = useNavigate();
+  const [tempInfo, setTempInfo] = useState({
+    previousTemp: "",
+    currentTemp: "",
+    nextTemp: "",
+    differenceTemp: "",
+    isIncrease: false,
+  });
+  const [weatherInfo, setWeatherInfo] = useState(null);
+  const [recommandItems, setRecommandItems] = useState([]);
+
+  const weatherCode = [
+    {
+      code: 100,
+      alt: "맑음:해",
+      src: "sunny",
+    },
+    {
+      code: 101,
+      alt: "맑음:달",
+      src: "moon",
+    },
+    {
+      code: 300,
+      alt: "구름많음:해",
+      src: "sunny-cloudy",
+    },
+    {
+      code: 301,
+      alt: "구름많음:달",
+      src: "moon-cloudy",
+    },
+    {
+      code: 310,
+      alt: "구름많음:해:비",
+      src: "sunny-cloudy-rain",
+    },
+    {
+      code: 311,
+      alt: "구름많음:달:비",
+      src: "moon-cloudy-rain",
+    },
+    {
+      code: 410,
+      alt: "비",
+      src: "rainy",
+    },
+    {
+      code: 420,
+      alt: "눈/비",
+      src: "rainy-snow",
+    },
+    {
+      code: 430,
+      alt: "눈",
+      src: "snow",
+    },
+  ];
+
+  const recommandItemList = [
+    {
+      "비" : [
+        {
+          alt: "우산",
+          src: "umbrella",
+        },
+        {
+          alt: "레인코트",
+          src: "raincoat",
+        },
+        {
+          alt: "레인부츠",
+          src: "rainboots",
+        },
+        {
+          alt: "손수건",
+          src: "handkerchief",
+        },
+      ]
+    },
+    {
+      "맑음" : [
+        {
+          alt: "선크림",
+          src: "suncream",
+        },
+        {
+          alt: "손수건",
+          src: "handkerchief",
+        },
+        {
+          alt: "모자",
+          src: "hat",
+        },
+        {
+          alt: "휴대용 선풍기",
+          src: "fan",
+        },
+        {
+          alt: "데오드란트",
+          src: "deodorant",
+        },
+      ]
+    }
+  ];
+
+  const options = {
+    hour12: false,
+    year: "numeric",
+    month: "numeric",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+
+  const currentDate = new Date().toLocaleString("ko-KR", options);
+  const splitDate = currentDate.split(" ");
+
+  const time = `${splitDate[splitDate.length - 1].split(":")[0]}00`;
+  const date = splitDate.reduce((acc, cur, idx, arr) => {
+    if (idx === 2) {
+      arr.splice(1);
+    }
+
+    return acc + cur;
+  }).split(".");
+
+  const handleTempInfo = (tmpFilter) => {
+    const differenceTemp = Number(tmpFilter[0][1]) - Number(tmpFilter[1][1]);
+
+    let isNegative = false;
+
+    if (differenceTemp !== 0 && Math.sign(differenceTemp) === -1) {
+      isNegative = true;
+    }
+
+    setTempInfo({
+      previousTemp: tmpFilter[0][1],
+      currentTemp: tmpFilter[1][1],
+      nextTemp: tmpFilter[2][1],
+      differenceTemp,
+      isIncrease: isNegative,
+    });
+  };
+
+  const getWeather = async () => {
+    const result = await getWeatherInfo();
+    const entries = Object.entries(result.data.weatherResult);
+
+    const tmpFilter = entries.filter((item) => item[0].includes("TMP"));
+    handleTempInfo(tmpFilter);
+
+    const timeFilter = entries.filter((item) => item[0].includes(time));
+
+    let code = Number(`${timeFilter[1][1]}${timeFilter[2][1]}0`);
+
+    if (timeFilter[1][1] === "4") {
+      code = ("1800" < time || "0600" > time) ? 300 : 301;
+    }
+
+    if (("1800" < time || "0600" > time) && timeFilter[1][1] !== "4") {
+      code = Number(`${timeFilter[1][1]}${timeFilter[2][1]}1`);
+    }
+
+    const info = weatherCode.filter((item) => item.code === code);
+    const pcp = timeFilter[3][1] === "강수없음" ? 0 : timeFilter[3][1];
+
+    setWeatherInfo(Object.assign(...info, { pcp }));
+  };
+
+  const handleRandomRecommandItem = () => {
+    let items = recommandItemList[1]["맑음"];
+
+    if (weatherInfo && weatherInfo.alt.includes("비")) {
+      items = recommandItemList[0]["비"];
+    }
+
+    const randomItemList = [];
+    const ItemList = [];
+    let j = 0;
+
+    const sameNum = (number) => {
+      return randomItemList.find((item) => item === number);
+    };
+
+    while (j < 3) {
+      const randomNumber = Math.floor(Math.random() * items.length);
+
+      if (!sameNum(randomNumber)) {
+        randomItemList.push(randomNumber);
+        j++;
+      }
+    }
+
+    for (const value of randomItemList) {
+      ItemList.push(items[value]);
+    }
+
+    setRecommandItems(ItemList);
+  };
+
+  useEffect(() => {
+    getWeather();
+    handleRandomRecommandItem();
+  }, []);
+
   return (
     <WeatherContainer>
       <div className="weatherInfo">
-        <button>
+        <button onClick={() => {navigate("/");}}>
           <img src={exit} alt="exitButton" />
         </button>
         <span>Weather</span>
@@ -20,57 +227,58 @@ const Weather = () => {
       </div>
       <div className="weather">
         <div className="tempDetail">
-          <p className="date">6월 30일</p>
+          <p className="date">{`${date[1]}월 ${date[2]}일`}</p>
           <div className="currentTemp">
-            <p>24</p>
-            <sup>⬇1°</sup>
+            <p>{tempInfo && tempInfo.currentTemp}</p>
+            <sup>{tempInfo && `${tempInfo.isIncrease ? "⬆" : "⬇"}${tempInfo.differenceTemp}`}°</sup>
           </div>
           <div className="beforAfterTemp">
-            <p className="beforeTemp">23</p>
+            <p className="beforeTemp">{tempInfo && tempInfo.previousTemp}</p>
             <div className="line" />
-            <p className="afterTemp">25</p>
+            <p className="afterTemp">{tempInfo && tempInfo.nextTemp}</p>
           </div>
         </div>
         <div className="weatherWarnInfo">
-          <p>미세</p>
-          <p className="upm">초미세</p>
+          {/* <p>미세</p>
+          <p className="upm">초미세</p> */}
         </div>
       </div>
       <div className="weatherDetail">
         <div className="container">
           <div className="currentWeatherIcon">
-            <img src={rainy} alt="rainy" />
+            {weatherInfo && <img
+              src={require(`../assets/weatherIcons/${weatherInfo.src}.png`)}
+              alt={weatherInfo.alt}
+            />}
           </div>
           <div className="currentLocation">
             <p>화성시 청계동</p>
-            <button>
-              <img src={reload} alt="reload" />
+            <button className="reloadBtn">
+              <img src={reload} alt="reload" onClick={() => {
+                getWeather();
+                handleRandomRecommandItem();
+              }} />
             </button>
           </div>
           <div className="recommandItem">
             <p>오늘의 추천 아이템</p>
             <div className="itemList">
-              <div className="item">
-                <img src={umbrella} alt="umbrella" />
-                <p>우산</p>
-              </div>
-              <div className="item">
-                <img src={raincoat} alt="raincoat" />
-                <p>우비</p>
-              </div>
-              <div className="item">
-                <img src={rainboots} alt="rainboots" />
-                <p>장화</p>
-              </div>
+              {recommandItems && recommandItems.map((item) => (
+                <div className="item" key={item.src}>
+                  <img src={require(`../assets/recommandItemIcons/${item.src}.png`)} alt={item.alt} />
+                  <p>{item.alt}</p>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="rainfallInfo">
-            <div className="text">
-              <p>285</p>
-              <p>285</p>
-            </div>
-            <p className="rainfallText">강수량(mm)</p>
-          </div>
+          {weatherInfo && weatherInfo.alt.includes("비") &&
+            <div className="rainfallInfo">
+              <div className="text">
+                <p>{weatherInfo.pcp}</p>
+                <p>{weatherInfo.pcp}</p>
+              </div>
+              <p className="rainfallText">강수량(mm)</p>
+            </div>}
         </div>
       </div>
     </WeatherContainer>
@@ -86,6 +294,12 @@ const RainfallTextAnimation = keyframes`
   50% {
     clip-path: polygon(0% 60%, 16% 65%, 34% 66%, 51% 62%,
       67% 50%, 84% 45%, 100% 46%, 100% 100%, 0% 100%);
+  }
+`;
+
+const ReloadBtnAnimation = keyframes`
+  100% {
+    transform: rotate(720deg);
   }
 `;
 
@@ -197,12 +411,11 @@ const WeatherContainer = styled.div`
     display: flex;
     justify-content: center;
     width: 100%;
-    height: 100%;
     text-align: center;
 
     .container {
       width: 90%;
-      height: 65%;
+      height: fit-content;
       border-radius: 10px;
       background-color: rgba(255, 255, 255, 0.8);
 
@@ -226,9 +439,13 @@ const WeatherContainer = styled.div`
           color: #353535;
         }
 
-        button {
+        .reloadBtn {
           margin-top: 2px;
           background-color: transparent;
+
+          &:active {
+            animation: ${ReloadBtnAnimation} 1s linear;
+          }
 
           img {
             width: 16px;
@@ -238,8 +455,8 @@ const WeatherContainer = styled.div`
       }
 
       .recommandItem {
-        margin: 20px 10px;
-        padding: 10px;
+        margin: 20px 10px 30px 10px;
+        padding: 10px 10px 0 10px;
         border: 2px dashed rgba(54, 157, 252, 0.6);
         border-radius: 10px;
         background: rgba(255, 255, 255, 0.5);
@@ -263,20 +480,19 @@ const WeatherContainer = styled.div`
 
       .rainfallInfo {
         position: relative;
-        height: 12%;
+        height: 50px;
 
         .text {
-          position: relative;
-
           p {
             position: absolute;
+            bottom: 20px;
             right: 10px;
-            color: transparent;
-            font-size: 50px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 3rem;
             font-family: 'Katuri';
 
             &:nth-child(1) {
-              color: transparent;
+              color: rgba(255, 255, 255, 0.5);
               -webkit-text-stroke: 2px #03A9F4;
             }
 
@@ -290,8 +506,8 @@ const WeatherContainer = styled.div`
         .rainfallText {
           position: absolute;
           right: 10px;
-          bottom: 0;
-          font-size: 10px;
+          bottom: 10px;
+          font-size: 0.5rem;
           font-family: 'Katuri';
         }
       }
