@@ -1,16 +1,68 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
-const CalendarModal = () => {
+import { createEvent } from "../api";
+
+const CalendarModal = ({ handleModal, speechResult }) => {
+  const handleCloseModal = () => {
+    handleModal(false);
+  };
+  const [input, setInput] = useState({
+    summary: speechResult.summary,
+    date: speechResult.date,
+  });
+
+  const handleChangeInput = (event) => {
+    const { name, value } = event.target;
+
+    setInput({
+      ...input,
+      [name]: value,
+    });
+  };
+
+  const handleSubmitEvent = async (event) => {
+    event.preventDefault();
+
+    const { summary, date } = input;
+    await createEvent(summary, date);
+  };
+
   return (
     <CalendarModalContainer>
-      <form>
+      <form onSubmit={handleSubmitEvent}>
         <div className="formContent">
-          <input className="title" type="text" placeholder="제목을 입력해주세요" />
-          <input className="date" type="datetime-local" />
+          <input
+            className="title"
+            type="text"
+            name="summary"
+            placeholder="제목을 입력해주세요"
+            onChange={handleChangeInput}
+            value={input.summary}
+            required
+          />
+          { speechResult.isDirect
+            ? <input
+              className="date"
+              type="datetime-local"
+              name="date"
+              onChange={handleChangeInput}
+              value={input.date}
+              required
+            />
+            : <input
+              className="date"
+              type="text"
+              name="date"
+              placeholder="예시) 12월 25일 오전 9시 35분"
+              onChange={handleChangeInput}
+              value={input.date}
+              required
+            />
+          }
           <div>
             <button className="submitBtn">Submit</button>
-            <button type="button" className="cancelBtn">Cancel</button>
+            <button type="button" className="cancelBtn" onClick={handleCloseModal}>Cancel</button>
           </div>
         </div>
       </form>
