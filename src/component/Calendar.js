@@ -1,36 +1,81 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 
 import exit from "../assets/icons/exit.png";
 import mic from "../assets/icons/mic.png";
 import plus from "../assets/icons/plus.png";
+import { validCalendarEventText } from "../utils/validCalendarEventText";
 import CalendarModal from "./CalendarModal";
 
 const Calendar = () => {
+  const navigate = useNavigate();
   const [voiceOn, setVoiceOn] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [speechResult, setSpeechResult] = useState({
+    summary: "(제목 없음)",
+    date: new Date().toISOString(),
+    isDirect: false,
+  });
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+
+  recognition.interimResults = false;
+  recognition.lang = "ko-KR";
+
+  const handleOpenModal = (event) => {
+    setOpenModal(true);
+  };
+
+  const handleModal = (result) => {
+    setOpenModal(result);
+  };
 
   const toggleMicButton = () => {
     setVoiceOn((micOn) => !micOn);
   };
 
+  const handleSpeechRecognition = () => {
+    recognition.start();
+    recognition.onresult = (event) => {
+      const word = event.results[0][0].transcript;
+      setVoiceOn(false);
+
+      const regex = /^(\d\d월)|(\d\d일)|([오전오후])|(\d시)|([\d분\d\d분])/g;
+
+      if (regex.test(word)) {
+        const result = validCalendarEventText(word);
+
+        setSpeechResult(Object.assign(result, { isDirect: true }));
+        setOpenModal(true);
+      } else {
+        setOpenModal(true);
+      }
+    };
+  };
+
   return (
     <CalendarContainer>
       <div className="calendarInfo">
-        <button>
+        <button onClick={() => {navigate("/");}}>
           <img src={exit} alt="exitButton" />
         </button>
         <span>Calendar</span>
-        <button>
+        <button onClick={handleOpenModal}>
           <img className="calendarBtn" src={plus} alt="addCalendarBtn" />
         </button>
       </div>
       <div className="voice">
         <pre className="example">
           <p>[예시]</p>
-          <p>12월 25일 오전 9시</p>
+          <p>12월 25일 오전 9시 35분</p>
           <p>케이크 만들기</p>
         </pre>
-        <button className="micBtn" onClick={toggleMicButton}>
+        <button className="micBtn" onClick={() => {
+          toggleMicButton();
+          handleSpeechRecognition();
+        }}>
           <img className={voiceOn ? "micOn" : ""} src={mic} alt="voiceBtn" />
         </button>
         {voiceOn ?
@@ -43,7 +88,7 @@ const Calendar = () => {
             <p>마이크 버튼을 누르면 일정을 등록할 수 있습니다.</p>
           </div>
         }
-        <CalendarModal />
+        {openModal && <CalendarModal handleModal={handleModal} speechResult={speechResult} />}
       </div>
     </CalendarContainer>
   );
@@ -69,7 +114,6 @@ const CalendarContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: fixed;
     top: 0;
     width: 100%;
     height: 40px;
