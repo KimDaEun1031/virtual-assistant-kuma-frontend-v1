@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { updateUser } from "../api";
@@ -10,16 +10,18 @@ import exit from "../assets/icons/exit.png";
 import PreferenceModal from "./PreferenceModal";
 
 const Preference = () => {
+  const { state } = useLocation();
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
   const [modalNumber, setModalNumber] = useState(1);
   const [userInfo, setUserInfo] = useState({
-    name: "",
+    name: "KUMA",
     character: "kuma",
   });
 
   const handleOpenModal = (event) => {
     const { value } = event.currentTarget;
+
     setModalNumber(value);
     setOpenModal(true);
   };
@@ -41,7 +43,14 @@ const Preference = () => {
     event.preventDefault();
 
     const { name, character } = userInfo;
-    await updateUser(name, character);
+    const result = await updateUser(state.email, name, character);
+
+    const user = result.data.user;
+
+    setUserInfo({
+      name: user.name,
+      character: user.character,
+    });
   };
 
   return (
@@ -73,7 +82,7 @@ const Preference = () => {
               <div className="characterList">
                 <button
                   type="button"
-                  value="koi"
+                  value="koa"
                   name="character"
                   onClick={handleChangeInfo}
                 >

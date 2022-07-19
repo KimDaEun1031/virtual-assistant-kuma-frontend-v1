@@ -1,18 +1,22 @@
 import { Stage } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import React, { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 
-import { getCalendarEvent } from "../api";
+import { getTodayEvent, getToken } from "../api";
 import calendarIcon from "../assets/icons/calendar.png";
 import chatIcon from "../assets/icons/chat.png";
 import cludeIcon from "../assets/icons/clude.png";
 import homeIcon from "../assets/icons/home.png";
 import settingIcon from "../assets/icons/settings.png";
 import speechBubble from "../assets/main-speech-bubble.png";
+import { createCalendarEventText } from "../utils/createCalendarEventText";
 import Model from "./Model";
 
 const Main = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [sentenseList, setSentenseList] = useState([
     "안녕? 나는 KUMA라고 해! 뭘 도와줄까?",
     "오늘 어땠어?",
@@ -23,6 +27,18 @@ const Main = () => {
     text: sentenseList[0],
     length: 1,
   });
+  const [userInfo, setUserInfo] = useState([]);
+  const charactersInfo = [
+    {
+      "kuma": "귀여운 아기곰",
+    },
+    {
+      "koa": "새침한 코알라"
+    },
+    {
+      "koi": "사랑스러운 강아지"
+    }
+  ];
 
   const timer = useRef(null);
 
@@ -64,15 +80,42 @@ const Main = () => {
 
   const stringToRender = currentText.text.substring(0, currentText.length);
 
-  const getEvent = async () => {
-    const result = await getCalendarEvent();
-    const { todayEvent } = result.data;
+  const handleGetTodayEvent = async () => {
+    const result = await getTodayEvent();
 
-    if (todayEvent) {
-      setSentenseList([
-        ...sentenseList,
-        todayEvent
-      ]);
+    if (result.data.user) {
+      const filterCharactersInfo = charactersInfo.filter((item) => item[result.data.user.character]);
+      const charcterInfo = filterCharactersInfo[0][result.data.user.character];
+
+      setUserInfo(Object.assign(result.data.user, { charcterInfo }));
+    }
+
+    if (result.data.todayEvents && result.data.todayEvents.length !== 0) {
+      const eventTexts = createCalendarEventText(result.data.todayEvents);
+
+      eventTexts.forEach((item) => {
+        setSentenseList([...sentenseList, item]);
+      });
+    }
+  };
+
+  const getEvent = async () => {
+    if (!localStorage.getItem("token")) {
+      const query = location.search.split("?")[1];
+      const params = new URLSearchParams(query);
+      const code = params.get("code");
+
+      localStorage.setItem("code", code);
+
+      const result = await getToken(code);
+
+      if (result.data.tokens) {
+        localStorage.setItem("token", JSON.stringify(result.data.tokens));
+
+        handleGetTodayEvent();
+      }
+    } else {
+      handleGetTodayEvent();
     }
   };
 
@@ -82,7 +125,7 @@ const Main = () => {
 
   return (
     <MainContainer>
-      <div className="characterContainer">
+      {userInfo && <div className="characterContainer">
         <div className="characterSpeechBubble">
           <img src={speechBubble} alt="speechBubble" />
           <div className="sentenseContainer">
@@ -99,26 +142,44 @@ const Main = () => {
           </Suspense>
         </Canvas>
         <div className="characterInfo">
-          <p className="characterName">KUMA</p>
-          <p className="characterSentence">귀여운 아기곰</p>
+          <p className="characterName">
+            {userInfo.character}
+          </p>
+          <p className="characterSentence">
+            {userInfo.charcterInfo}
+          </p>
         </div>
-      </div>
+      </div>}
       <div className="menuContainer">
         <ul>
           <li>
-            <img src={settingIcon} alt="preference" />
+            <button onClick={() => {navigate("/preference", {
+              state: userInfo,
+            });}}>
+              <img src={settingIcon} alt="preference" />
+            </button>
           </li>
           <li>
-            <img src={cludeIcon} alt="weather" />
+            <button onClick={() => {navigate("/weather");}}>
+              <img src={cludeIcon} alt="weather" />
+            </button>
           </li>
           <li className="home">
-            <img src={homeIcon} alt="home" />
+            <button onClick={() => {navigate("/");}}>
+              <img src={homeIcon} alt="home" />
+            </button>
           </li>
           <li>
-            <img src={chatIcon} alt="chat" />
+            <button onClick={() => {navigate("/chat", {
+              state: userInfo,
+            });}}>
+              <img src={chatIcon} alt="chat" />
+            </button>
           </li>
           <li>
-            <img src={calendarIcon} alt="calendar" />
+            <button onClick={() => {navigate("/calendar");}}>
+              <img src={calendarIcon} alt="calendar" />
+            </button>
           </li>
         </ul>
         <div className="line" />
@@ -222,10 +283,14 @@ const MainContainer = styled.div`
       li {
         text-align: center;
 
+        button {
+          background-color: transparent;
+        }
+
         &.home {
           transform: translateY(-25px);
           padding: 5px;
-          border-radius: 50px;
+          border-radius: 50%;
           border: 3px #92E32B solid;
           background-color: #F9F9F9;
 
