@@ -5,9 +5,6 @@ import styled, { keyframes } from "styled-components";
 import { getWeatherInfo } from "../api";
 import exit from "../assets/icons/exit.png";
 import reload from "../assets/icons/reload.png";
-import rainboots from "../assets/recommandItemIcons/rainboots.png";
-import raincoat from "../assets/recommandItemIcons/raincoat.png";
-import umbrella from "../assets/recommandItemIcons/umbrella.png";
 
 const Weather = () => {
   const navigate = useNavigate();

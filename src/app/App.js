@@ -4,7 +4,6 @@ import styled from "styled-components";
 
 import Calendar from "../component/Calendar";
 import Chat from "../component/Chat";
-import Loading from "../component/Loading";
 import Login from "../component/Login";
 import Main from "../component/Main";
 import Preference from "../component/Preference";
@@ -21,7 +20,6 @@ const App = () => {
         <Route path="/weather" element={<Weather />} />
         <Route path="/preference" element={<Preference />} />
       </Routes>
-      {/* <Loading /> */}
     </MainContainer>
   );
 };
