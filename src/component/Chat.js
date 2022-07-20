@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { getChatAnswer } from "../api";
-import consulting from "../assets/icons/consulting.png";
 import exit from "../assets/icons/exit.png";
 import kumaProfile from "../assets/profiles/kuma-profile.png";
 
 const Chat = () => {
+  const { state } = useLocation();
+  const navigate = useNavigate();
   const [messageInput, setMessageInput] = useState({
     message: ""
   });
   const [messages, setMessages] = useState([]);
+  const [userInfo] = useState({
+    name: state.name,
+    character: state.character,
+  });
 
   const getMessage = async (text) => {
     const result = await getChatAnswer(text);
@@ -21,10 +27,7 @@ const Chat = () => {
     };
 
     if (result.data) {
-      setMessages([
-        ...messages,
-        messageInfo,
-      ]);
+      setMessages((list) => list.concat(messageInfo));
     }
   };
 
@@ -43,17 +46,16 @@ const Chat = () => {
     if (messageInput.message) {
       const messageInfo = {
         sender: "human",
-        message: text,
+        message: messageInput.message,
       };
 
-      setMessages([
-        ...messages,
-        messageInfo,
-      ]);
+      setMessages((list) => list.concat(messageInfo));
 
       setMessageInput({
         message: ""
       });
+
+      getMessage(messageInput.message);
     }
   };
 
@@ -64,18 +66,16 @@ const Chat = () => {
   return (
     <ChatContainer>
       <div className="chatInfo">
-        <button>
+        <button onClick={() => {navigate("/");}}>
           <img src={exit} alt="exitButton" />
         </button>
-        <span>KUMA</span>
-        <button>
-          <img className="consultingBtn" src={consulting} alt="consultingButton" />
-        </button>
+        <span>{userInfo && userInfo.character}</span>
+        <div />
       </div>
       <div className="chat">
         <ul>
-          {messages.length !== 0 && messages.map((item) => (
-            <li className={item.sender}>
+          {messages.length !== 0 && messages.map((item, idx) => (
+            <li className={item.sender} key={idx}>
               {item.sender === "bot" && <img src={kumaProfile} alt="profile" />}
               <p>{item.message}</p>
             </li>
@@ -84,7 +84,7 @@ const Chat = () => {
       </div>
       <form className="chatInputContainer" onSubmit={handleSendMessage}>
         <input
-          placeholder="KUMA에게 메세지 보내기"
+          placeholder={`${userInfo && userInfo.character}에게 메세지 보내기`}
           onChange={handleChatInput}
           value={messageInput.message}
           name="message"
