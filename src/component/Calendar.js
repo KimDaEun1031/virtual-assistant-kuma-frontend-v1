@@ -58,7 +58,7 @@ const Calendar = () => {
   return (
     <CalendarContainer>
       <div className="calendarInfo">
-        <button onClick={() => {navigate("/");}}>
+        <button onClick={() => {navigate("/main");}}>
           <img src={exit} alt="exitButton" />
         </button>
         <span>Calendar</span>

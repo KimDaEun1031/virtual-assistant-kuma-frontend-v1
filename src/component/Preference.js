@@ -56,7 +56,7 @@ const Preference = () => {
   return (
     <PreferenceContainer>
       <div className="preferenceInfo">
-        <button onClick={() => {navigate("/");}}>
+        <button onClick={() => {navigate("/main");}}>
           <img src={exit} alt="exitButton" />
         </button>
         <span>Preference</span>

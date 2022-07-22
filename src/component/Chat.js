@@ -66,7 +66,7 @@ const Chat = () => {
   return (
     <ChatContainer>
       <div className="chatInfo">
-        <button onClick={() => {navigate("/");}}>
+        <button onClick={() => {navigate("/main");}}>
           <img src={exit} alt="exitButton" />
         </button>
         <span>{userInfo && userInfo.character}</span>

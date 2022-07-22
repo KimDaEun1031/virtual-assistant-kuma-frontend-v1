@@ -165,7 +165,7 @@ const Main = () => {
             </button>
           </li>
           <li className="home">
-            <button onClick={() => {navigate("/");}}>
+            <button onClick={() => {navigate("/main");}}>
               <img src={homeIcon} alt="home" />
             </button>
           </li>
