@@ -13,8 +13,13 @@ const App = () => {
   return (
     <MainContainer>
       <Routes>
+<<<<<<< HEAD
         <Route path="/" element={<Login />} />
         <Route path="/main" element={<Main />} />
+=======
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Main />} />
+>>>>>>> 34f01fc96c567aab07d3f45b2e2461858720f740
         <Route path="/chat" element={<Chat />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/weather" element={<Weather />} />
