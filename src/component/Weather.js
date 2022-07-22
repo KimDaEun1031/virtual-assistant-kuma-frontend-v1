@@ -216,11 +216,7 @@ const Weather = () => {
   return (
     <WeatherContainer>
       <div className="weatherInfo">
-<<<<<<< HEAD
         <button onClick={() => {navigate("/main");}}>
-=======
-        <button onClick={() => {navigate("/");}}>
->>>>>>> 34f01fc96c567aab07d3f45b2e2461858720f740
           <img src={exit} alt="exitButton" />
         </button>
         <span>Weather</span>
