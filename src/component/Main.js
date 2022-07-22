@@ -73,10 +73,10 @@ const Main = () => {
     return true;
   }, [currentText, sentenseList]);
 
-  useEffect(() => {
-    timer.current = setTimeout(typingAnimation, 40);
-    return unmountTimer;
-  }, [typingAnimation]);
+  // useEffect(() => {
+  //   timer.current = setTimeout(typingAnimation, 40);
+  //   return unmountTimer;
+  // }, [typingAnimation]);
 
   const stringToRender = currentText.text.substring(0, currentText.length);
 
@@ -125,11 +125,11 @@ const Main = () => {
 
   return (
     <MainContainer>
-      {userInfo && <div className="characterContainer">
+      <div className="characterContainer">
         <div className="characterSpeechBubble">
           <img src={speechBubble} alt="speechBubble" />
           <div className="sentenseContainer">
-            <p className="sentense">{stringToRender}</p>
+            <p className="sentense">{sentenseList[0]}</p>
           </div>
         </div>
         <Canvas flat linear className="character">
@@ -143,13 +143,13 @@ const Main = () => {
         </Canvas>
         <div className="characterInfo">
           <p className="characterName">
-            {userInfo.character}
+            {userInfo && userInfo.character}
           </p>
           <p className="characterSentence">
-            {userInfo.charcterInfo}
+            {userInfo && userInfo.charcterInfo}
           </p>
         </div>
-      </div>}
+      </div>
       <div className="menuContainer">
         <ul>
           <li>
