@@ -45,19 +45,23 @@ KUMA는 자연스러운 채팅을 기반으로 하는 챗봇 서비스와 구글
 기능 소개
 ---
 #### Main Page
+![main](https://user-images.githubusercontent.com/73865700/181680058-683a2b35-40df-4ac9-8934-031dd6098d9b.gif)
 - 메인페이지에서는 사용자가 선택한 캐릭터와 문장이 나오는 말풍선, 페이지 메뉴를 볼 수 있습니다.
 - 각 아이콘에 맞는 메뉴를 클릭하면 Chatbot, Calendar, Weather, Preference 페이지로 이동합니다.
 
 #### ChatBot Page
+![chat](https://user-images.githubusercontent.com/73865700/181680072-d456ac8b-2419-47b8-a431-bbd690bd9252.gif)
 - 챗봇 페이지에서는 사용자와 챗봇이 자유롭게 대화를 나눌 수 있습니다.
 - 챗봇 페이지에서 챗봇과 했던 소통들은 저장되지 않습니다.
 
 #### Calendar Page
+![calendar](https://user-images.githubusercontent.com/73865700/181680085-36f94950-c614-488a-a5d0-1f8d4c8b770d.gif)
 - 캘린더 페이지에서는 사용자의 구글 캘린더와 연동하여 일정을 등록할 수 있습니다.
 - 마이크 버튼을 누르면 음성인식이 활성화되며, 음성인식이 종료되면 일정을 수정할 수 있는 모달이 나타납니다.
 - 음성인식을 사용하지 않고도 직접 일정을 입력해 구글 캘린더에 등록할 수 있습니다.
 
 #### Weather Page
+![weather](https://user-images.githubusercontent.com/73865700/181680101-8507a3cd-1123-4c80-baec-d18de2b7b9a4.gif)
 - 날씨 페이지에서는 현재 시간의 날씨와 온도, 현재 날씨에 맞는 추천 아이템을 보여줍니다.
 - 비가 온다면 현재 강수량이 얼마나 되는지 표시됩니다.
 
