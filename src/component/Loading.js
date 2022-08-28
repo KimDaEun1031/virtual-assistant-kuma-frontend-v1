@@ -4,22 +4,16 @@ import styled, { keyframes } from "styled-components";
 import kuma from "../assets/kuma.png";
 
 const Loading = () => {
+  const loadingText = "LOADING...";
+
   return (
     <LoadingContainer>
       <div className="loading">
         <LoadingPhrase>
-          <span>L</span>
-          <span>O</span>
-          <span>A</span>
-          <span>D</span>
-          <span>I</span>
-          <span>N</span>
-          <span>G</span>
-          <span>.</span>
-          <span>.</span>
-          <span>.</span>
+          {loadingText.split("").map((text, idx) => (
+            <span key={idx}>{text}</span>
+          ))}
         </LoadingPhrase>
-        <div className="loadingStatus" />
       </div>
       <div>
         <img className="kuma" src={kuma} alt="kuma" />
