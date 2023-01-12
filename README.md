@@ -1,5 +1,6 @@
-# 🐻 KUMA
+# 🐻 KUMA V1
 KUMA는 자연스러운 채팅을 기반으로 하는 챗봇 서비스와 구글 캘린더 연동 서비스, 날씨 서비스 등을 제공하는 가상 비서 서비스 웹앱입니다.
+현재 앱은 V1에서 V2로 업그레이드되고 있습니다.
 
 > [배포 APK](https://drive.google.com/file/d/1NcOCYrixyf07sRCXf4cwyxNAS17bHdTy/view?usp=sharing) (Expo 기반 APK) : 구글 드라이브에서 다운받으실 수 있습니다.
 
